@@ -239,7 +239,8 @@ const AiPlanPage = () => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-purple-100">
+
+    <div className="md:ml-56 p-4 sm:p-6 bg-gray-50 min-h-screen">
       <Header />
       <div className="flex flex-1 relative">
         {/* Mobile sidebar toggle */}
