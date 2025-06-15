@@ -173,7 +173,7 @@ const FormsContainer = ({ isActive }) => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/users/signup", {
+      const res = await fetch("https://travel-tally-3mf9.onrender.com/api/users/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -195,7 +195,7 @@ const FormsContainer = ({ isActive }) => {
   const loginsubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch("https://travel-tally-3mf9.onrender.com/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginformData),
