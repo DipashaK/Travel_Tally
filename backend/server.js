@@ -6,7 +6,10 @@ const mongoose = require("mongoose");
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: "https://traveltally.netlify.app", 
+  credentials: true, 
+}));
 app.use(express.json());
 
 // MongoDB Connection
