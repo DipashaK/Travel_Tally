@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useMemo } from "react";
 import CardSection from "../CardSection";
-import { convertToList, formatItinerary } from "../utils";
+import { convertToList, formatItinerary, parseCuisines } from "../utils";
 import WeatherSection from "./WeatherSection";
 import PackingChecklist from "./PackingCheclist";
 import axios from "axios";
 import TopPlacesMap from "./TopPlacesMap";
+import ReactMarkdown from "react-markdown";
 
 const Sections = ({ parsedPlan, sectionRefs, destination }) => {
   const finalDestination = destination || parsedPlan.destination;
+  const cuisines = useMemo(() => parseCuisines(parsedPlan.localCuisines), [parsedPlan.localCuisines]);
   const [imageUrl, setImageUrl] = useState(null);
 
   const placesArray = useMemo(() => {
@@ -20,7 +22,6 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
 
   const [placesWithCoords, setPlacesWithCoords] = useState([]);
 
-  // ✅ Replace this with your OpenCage API Key
   const OPENCAGE_API_KEY = "387116cc2302431590215e21b3e1c0d2";
 
   useEffect(() => {
@@ -28,13 +29,16 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
       const results = await Promise.all(
         placesArray.map(async (place) => {
           try {
-            const res = await axios.get("https://api.opencagedata.com/geocode/v1/json", {
-              params: {
-                key: OPENCAGE_API_KEY,
-                q: `${place}, ${finalDestination}`,
-                limit: 1,
-              },
-            });
+            const res = await axios.get(
+              "https://api.opencagedata.com/geocode/v1/json",
+              {
+                params: {
+                  key: OPENCAGE_API_KEY,
+                  q: `${place}, ${finalDestination}`,
+                  limit: 1,
+                },
+              }
+            );
 
             if (res.data.results.length > 0) {
               const location = res.data.results[0].geometry;
@@ -54,7 +58,9 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
         })
       );
 
-      setPlacesWithCoords(results.filter((p) => p.lat !== null && p.lon !== null));
+      setPlacesWithCoords(
+        results.filter((p) => p.lat !== null && p.lon !== null)
+      );
     }
 
     if (placesArray.length > 0 && finalDestination) {
@@ -68,12 +74,15 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
     if (finalDestination) {
       const fetchImage = async () => {
         try {
-          const response = await axios.get(`https://api.unsplash.com/search/photos`, {
-            params: { query: finalDestination, per_page: 1 },
-            headers: {
-              Authorization: `Client-ID ynspY4f87MR7fgR-dxJm_Lf2mvXpKWSBIVBamIn28hc`,
-            },
-          });
+          const response = await axios.get(
+            `https://api.unsplash.com/search/photos`,
+            {
+              params: { query: finalDestination, per_page: 1 },
+              headers: {
+                Authorization: `Client-ID ynspY4f87MR7fgR-dxJm_Lf2mvXpKWSBIVBamIn28hc`,
+              },
+            }
+          );
 
           if (response.data.results.length > 0) {
             setImageUrl(response.data.results[0].urls.regular);
@@ -102,9 +111,9 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
             className="w-full h-64 object-cover rounded-xl mb-4"
           />
         )}
-        <ul className="list-disc pl-6">
-          {convertToList(parsedPlan.aboutPlace, "📍")}
-        </ul>
+        <div className="prose prose-sm text-gray-800 max-w-none">
+          <ReactMarkdown>{parsedPlan.aboutPlace}</ReactMarkdown>
+        </div>
       </CardSection>
 
       <CardSection title="Weather" innerRef={sectionRefs.weather}>
@@ -119,7 +128,15 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
 
       <CardSection title="Top Places to Visit" innerRef={sectionRefs.places}>
         <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
-          <div style={{ flex: 1, maxWidth: "300px", overflowY: "auto", maxHeight: "400px", marginTop: "30px" }}>
+          <div
+            style={{
+              flex: 1,
+              maxWidth: "300px",
+              overflowY: "auto",
+              maxHeight: "400px",
+              marginTop: "30px",
+            }}
+          >
             <ul className="list-decimal pl-6">
               {placesWithCoords.map((place) => (
                 <li
@@ -127,7 +144,8 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
                   style={{
                     cursor: "pointer",
                     marginBottom: "0.5rem",
-                    fontWeight: selectedPlace === place.name ? "bold" : "normal",
+                    fontWeight:
+                      selectedPlace === place.name ? "bold" : "normal",
                     color: selectedPlace === place.name ? "#007bff" : "inherit",
                   }}
                   onClick={() => setSelectedPlace(place.name)}
@@ -141,7 +159,7 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
           <div style={{ flex: 2, height: "400px" }}>
             <TopPlacesMap
               places={placesWithCoords}
-              defaultCenter={[29.533, 75.020]}
+              defaultCenter={[29.533, 75.02]}
               defaultPlace={finalDestination}
               selectedPlace={selectedPlace}
               onSelectPlace={setSelectedPlace}
@@ -154,10 +172,30 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
         {formatItinerary(parsedPlan.itinerary)}
       </CardSection>
 
-      <CardSection title="Local Cuisines" innerRef={sectionRefs.cuisines}>
-        <ul className="list-disc pl-6">
-          {convertToList(parsedPlan.localCuisines, "🍽️")}
-        </ul>
+      <CardSection title="Local Cuisines" innerRef={sectionRefs.localCuisines}>
+        <div className="space-y-6 text-gray-800">
+          {cuisines.map((dish, idx) => (
+            <div
+              key={idx}
+              className="p-4 border border-purple-200 rounded-xl shadow-sm bg-purple-50"
+            >
+              <h3 className="text-lg font-semibold mb-1">🍽️ {dish.name}</h3>
+              <p className="mb-2">
+                📝 <span className="font-medium">Description:</span>{" "}
+                {dish.description}
+              </p>
+              <p className="font-medium mb-1">📍 Popular Places:</p>
+              <ul className="list-disc pl-6 text-sm space-y-1">
+                {dish.places.map((place, i) => (
+                  <li key={i}>
+                    <span className="font-semibold">{place.name}</span>,{" "}
+                    {place.area} – ⭐ {place.reason}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </CardSection>
 
       <CardSection title="Packing Checklist" innerRef={sectionRefs.packing}>

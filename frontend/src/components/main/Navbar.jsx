@@ -12,8 +12,8 @@ const Navbar = () => {
 
   useEffect(() => {
     // Check login status
-    const token = localStorage.getItem("token");
-    const email = localStorage.getItem("email");
+    const token = sessionStorage.getItem("token");
+    const email = sessionStorage.getItem("email");
     if (token && email) {
       setIsLoggedIn(true);
       setUserEmail(email);
@@ -46,11 +46,11 @@ const Navbar = () => {
   return (
     <nav className="absolute top-0 left-0 w-full flex items-center justify-between bg-transparent px-6 sm:px-10 py-4 sm:py-6 shadow-md z-50">
       {/* Logo */}
-      <img 
-        src={logo} 
-        alt="Logo" 
-        className="h-16 sm:h-20 cursor-pointer" 
-        onClick={() => navigate("/")} 
+      <img
+        src={logo}
+        alt="Logo"
+        className="h-16 sm:h-20 cursor-pointer"
+        onClick={() => navigate("/")}
       />
 
       {/* Right Side */}
@@ -58,18 +58,24 @@ const Navbar = () => {
         {!isLoggedIn ? (
           <>
             <button
-  className="px-6 sm:px-8 py-2 rounded-full bg-gradient-to-r from-green-400 to-green-600 text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg transition duration-300"
-
+              className="px-6 sm:px-8 py-2 rounded-full bg-gradient-to-r from-green-400 to-green-600 text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg transition duration-300"
               onClick={() => navigate("/login")}
-              style={{ pointerEvents: "auto", position: "relative", zIndex: 100 }}
+              style={{
+                pointerEvents: "auto",
+                position: "relative",
+                zIndex: 100,
+              }}
             >
               Login
             </button>
             <button
-  className="px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg transition duration-300"
-
+              className="px-4 sm:px-6 py-2 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 text-white font-semibold shadow-md hover:scale-105 hover:shadow-lg transition duration-300"
               onClick={() => navigate("/signup")}
-              style={{ pointerEvents: "auto", position: "relative", zIndex: 100 }}
+              style={{
+                pointerEvents: "auto",
+                position: "relative",
+                zIndex: 100,
+              }}
             >
               Sign Up
             </button>
@@ -87,7 +93,11 @@ const Navbar = () => {
             <div
               ref={dropdownRef}
               className={`absolute right-0 mt-12 bg-white shadow-lg rounded-lg p-4 z-50 transform transition-all duration-300 origin-top w-48 sm:w-56
-                ${showDropdown ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-2 pointer-events-none"}
+                ${
+                  showDropdown
+                    ? "opacity-100 scale-100 translate-y-0"
+                    : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+                }
               `}
             >
               <p className="text-black mb-2 break-words">Email : {userEmail}</p>
