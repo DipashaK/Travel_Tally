@@ -2,7 +2,7 @@ const express = require("express");
 const axios = require("axios");
 const Plan = require("../models/Plan");
 const authenticateUser = require("../middleware/authMiddleware");
-const User = require("../models/User")
+const User = require("../models/User");
 
 const router = express.Router();
 
@@ -31,81 +31,113 @@ router.post("/generate-plan", authenticateUser, async (req, res) => {
   const formattedEndDate = formatDate(new Date(endDate));
 
   const prompt = `
-    Create a detailed travel plan for a trip to ${destination} from ${formatDate(
+Create a detailed travel plan for a trip to ${destination} from ${formatDate(
     day1
   )} to ${formattedEndDate}.
-    The plan should include the following:
-  
-    **About ${destination}:**
-    - Provide a brief history of ${destination}, including key events and cultural significance.
-    - Mention any notable historical landmarks or periods that shaped the destination.
-  
-    **Top Activities:**
-    - List and describe the top activities available in ${destination}.
-    - Highlight both popular and unique activities that align with the traveler’s interests (e.g., nature, culture, food).
-  
-    **Top Places to Visit:**
-    - Provide a list of must-visit attractions in ${destination}.
-    - Include iconic landmarks, natural wonders, and cultural spots that should not be missed.
-    - Only provide the names of the main places to be visited.
-  
-    **Itinerary:**
-Create a detailed, day-by-day travel itinerary from ${formatDate(
-    day1
-  )} to ${formattedEndDate} for a trip to ${destination}. Tailor the activities to the traveler’s interests based on selected group and activity preferences.
 
-Each day should have a clear structure with time blocks like Morning, Afternoon, Evening, and Night, and under each block list relevant activities. Format it exactly like this:
+The plan should be structured using the **exact section headings** below so it can be parsed cleanly by a frontend renderer.
+
+---
+
+**About ${destination}**
+
+Start this section with a heading like "${destination}" (as the first line).  
+Provide a short, engaging history of the place.  
+Mention key cultural highlights and major historical landmarks or events.  
+Focus on need-to-know details for travelers — keep it concise but vivid.
+
+---
+
+**Top Activities**
+
+Use short activity titles (1–2 words) and follow each with 1–2 line descriptions.  
+Blend popular and offbeat activities (culture, food, adventure, relaxation, etc.)
+
+---
+
+**Top Places to Visit**
+
+List iconic places — use 1–2 word names only. No descriptions needed.  
+Include major landmarks, natural wonders, cultural spots, or quirky sites.
+
+---
+
+**Itinerary**
+
+Create a detailed, day-by-day itinerary from ${formatDate(
+    day1
+  )} to ${formattedEndDate}.  
+Follow this **exact format** for each day:
 
 Day 1: Arrival & Initial Exploration (${formatDate(day1)})
 Morning:
 - Arrive at ${destination} and check into accommodation.
-- Short rest or freshening up at hotel.
+- Freshen up and rest.
 
 Afternoon:
-- Visit a nearby market or local park for light exploration.
-- Try a casual local lunch spot.
+- Visit a nearby market or park.
+- Casual local lunch.
 
 Evening:
-- Explore popular neighborhood or shopping street.
-- Optional cultural activity (e.g., art exhibit, live show, or food walk).
+- Explore a vibrant neighborhood or shopping area.
+- Optional cultural experience (e.g., food tour or exhibit).
 
 Night:
-- Dinner at a restaurant offering traditional ${destination} cuisine.
-- Return to hotel for rest.
+- Dinner with traditional ${destination} cuisine.
+- Return to hotel and relax.
 
-Day 2: [Custom Title] (${formatDate(day2)})
-Morning:
-- Visit [Landmark A] or [Cultural Museum].
-...
+Repeat similar structure for Day 2–5.  
+Day 5 should be lighter with rest and departure.
 
-Day 3: ...
-Day 4: ...
-Day 5: Relaxation & Departure (${formattedEndDate})
-Morning:
-- Relax at hotel or nearby garden.
-...
+---
 
-Be consistent in formatting, and ensure the structure is maintained for all 5 days. Make sure the activities reflect the interests provided and offer both popular and offbeat experiences. Keep descriptions concise and practical for travel planning.
+**Local Cuisines**
 
-  
-    **Local Cuisines:**
-    - Describe the top local dishes to try in ${destination}, including street food and fine dining options.
-    - Mention where to find the best versions of these dishes and any must-try specialties.
-  
-    **Packing Checklist:**
-    - Provide a packing list that includes essentials for the trip to ${destination}.
-    - Consider clothing, accessories, and any special items needed (e.g., adapters, hiking gear, travel documents).
-  
-    **Best Time to Visit:**
-    - Recommend the best time of year to visit ${destination}, taking into account weather, festivals, and peak tourist seasons.
-    - Mention any key events or festivals that might enhance the travel experience.
-  
-    **Budget:**
-    - Estimate a budget for the trip, breaking down costs by flights, accommodation, meals, activities, and local transportation.
-    - Offer tips for saving money or finding more affordable options for each category.
-  
-    Ensure the itinerary is tailored to the traveler's interests, includes flexibility for spontaneous activities, and provides an immersive experience of ${destination}.
-  `;
+List 4–6 dishes using **this exact structure**:
+
+🍽️ [Dish Name]  
+Description: [Brief 1-sentence description]  
+Popular Places:  
+- [Place Name], [Area] – [Why it’s good]  
+- [Place Name], [Area] – [Why it’s good]  
+
+---
+
+**Packing Checklist**
+
+List only essentials based on the destination’s climate and activities:  
+- Clothing  
+- Shoes  
+- Adapters  
+- Medications  
+- Travel documents  
+- Special gear (if needed)
+
+---
+
+**Best Time to Visit**
+
+Mention the best months to visit.  
+Add any important festivals, seasonal events, or travel tips (short & useful).
+
+---
+
+**Budget**
+
+Break down typical costs into these categories:  
+- Flights  
+- Stay  
+- Food  
+- Transport  
+- Activities  
+
+For each, give an estimated range and include 1–2 quick money-saving tips.
+
+---
+
+Keep the entire plan concise, immersive, and structured.  
+Use consistent formatting (like **bold**, emojis, and lists) to improve readability for travelers.
+`;
 
   try {
     const apiKey = process.env.GOOGLE_API_KEY;
@@ -130,7 +162,7 @@ Be consistent in formatting, and ensure the structure is maintained for all 5 da
       console.log("Generated Plan:", generatedPlan);
 
       const newPlan = new Plan({
-        userId: req.user.id, 
+        userId: req.user.id,
         destination,
         startDate,
         endDate,
@@ -142,12 +174,11 @@ Be consistent in formatting, and ensure the structure is maintained for all 5 da
 
       const savedPlan = await newPlan.save();
 
-return res.json({
-  aiPlan: generatedPlan,
-  planId: savedPlan._id, // ✅ Send planId to frontend
-  message: "Plan saved successfully!",
-});
-
+      return res.json({
+        aiPlan: generatedPlan,
+        planId: savedPlan._id, // ✅ Send planId to frontend
+        message: "Plan saved successfully!",
+      });
     }
 
     res
@@ -158,7 +189,6 @@ return res.json({
     res.status(500).json({ error: "Error fetching AI plan." });
   }
 });
-
 
 router.get("/get-plan", authenticateUser, async (req, res) => {
   try {
@@ -171,7 +201,6 @@ router.get("/get-plan", authenticateUser, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch plans" });
   }
 });
-
 
 router.get("/get-plan/:planId", authenticateUser, async (req, res) => {
   try {
@@ -195,7 +224,6 @@ router.get("/me", authenticateUser, (req, res) => {
   res.json({ user: req.user });
 });
 
-
 // Public route to view a shared plan by ID (no authentication)
 router.get("/public/:planId", async (req, res) => {
   const planId = req.params.planId;
@@ -208,7 +236,7 @@ router.get("/public/:planId", async (req, res) => {
   // Return public info including invitedEmail
   res.json({
     planId: plan._id,
-    invitedEmail: plan.invitedEmail,  // Make sure this exists
+    invitedEmail: plan.invitedEmail, // Make sure this exists
     // ...any other public info you want to expose
   });
 });
@@ -234,12 +262,14 @@ router.put("/:planId/invite", async (req, res) => {
       return res.status(404).json({ message: "Plan not found" });
     }
 
-    res.json({ message: "Invited email updated", invitedEmail: updatedPlan.invitedEmail });
+    res.json({
+      message: "Invited email updated",
+      invitedEmail: updatedPlan.invitedEmail,
+    });
   } catch (error) {
     console.error("Error updating invitedEmail:", error);
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 module.exports = router;
