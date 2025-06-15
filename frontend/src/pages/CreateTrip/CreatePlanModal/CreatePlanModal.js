@@ -34,7 +34,7 @@ const CreatePlanModal = ({ isOpen, onClose }) => {
   try {
     const token = sessionStorage.getItem("token");
 
-    const response = await fetch("http://localhost:5000/api/plans/generate-plan", {
+    const response = await fetch("https://travel-tally-3mf9.onrender.com/api/plans/generate-plan", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

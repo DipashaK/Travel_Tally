@@ -98,7 +98,7 @@ const Dashboard = () => {
   const fetchUserPlans = async () => {
     try {
       const token = sessionStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/plans/get-plan", {
+      const response = await axios.get("https://travel-tally-3mf9.onrender.com/api/plans/get-plan", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

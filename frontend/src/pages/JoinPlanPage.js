@@ -103,7 +103,7 @@ const JoinPlanPage = () => {
     const processJoin = async () => {
       try {
         // Get public plan info (including invitedEmail)
-        const planRes = await fetch(`http://localhost:5000/api/plans/public/${planId}`);
+        const planRes = await fetch(`https://travel-tally-3mf9.onrender.com/api/plans/public/${planId}`);
         const planData = await planRes.json();
 
         if (!planRes.ok || !planData.invitedEmail) {
@@ -113,7 +113,7 @@ const JoinPlanPage = () => {
         }
 
         // Fetch full plan details (with auth)
-        const fullPlanRes = await fetch(`http://localhost:5000/api/plans/get-plan/${planId}`, {
+        const fullPlanRes = await fetch(`https://travel-tally-3mf9.onrender.com/api/plans/get-plan/${planId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -12,7 +12,7 @@ const PlanDetailPage = () => {
     const fetchPlan = async () => {
       try {
         const token = sessionStorage.getItem("token");
-        const res = await fetch(`http://localhost:5000/api/plans/get-plan/${planId}`, {
+        const res = await fetch(`https://travel-tally-3mf9.onrender.com/api/plans/get-plan/${planId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

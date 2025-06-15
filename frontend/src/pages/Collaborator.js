@@ -39,7 +39,7 @@ useEffect(() => {
   const fetchInvites = async () => {
     if (!planId || !token) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/mail/invites?planId=${planId}`, {
+      const res = await fetch(`https://travel-tally-3mf9.onrender.com/api/mail/invites?planId=${planId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -77,7 +77,7 @@ useEffect(() => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const response = await fetch("http://localhost:5000/api/mail/invite", {
+      const response = await fetch("https://travel-tally-3mf9.onrender.com/api/mail/invite", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -120,7 +120,7 @@ useEffect(() => {
     const token = sessionStorage.getItem("token");
 
     try {
-      const res = await fetch("http://localhost:5000/api/mail/revoke-invite", {
+      const res = await fetch("https://travel-tally-3mf9.onrender.com/api/mail/revoke-invite", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

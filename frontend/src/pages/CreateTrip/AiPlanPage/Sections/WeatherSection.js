@@ -25,7 +25,7 @@ const WeatherSection = ({ destination }) => {
         setLoading(true);
         setError(null);
         const response = await fetch(
-          `http://localhost:5000/api/weather/get-weather?destination=${destination}`
+          `https://travel-tally-3mf9.onrender.com/api/weather/get-weather?destination=${destination}`
         );
         const data = await response.json();
 
