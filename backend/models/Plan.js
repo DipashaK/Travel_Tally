@@ -11,9 +11,9 @@ const planSchema = new mongoose.Schema({
   selectedGroup: String,
   budget: String,
   aiPlan: String,
-  invitedEmail: {
-    type: String,
-    default: null, 
+  invitedEmails: {
+    type: [String],
+    default: [],
   },
 }, { timestamps: true });
 

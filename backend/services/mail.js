@@ -97,11 +97,12 @@ router.post("/invite", authenticateUser, async (req, res) => {
       planName,
       inviteLink,
       invitedBy: req.user.id,
+      createdAt: new Date()
     });
 
     const updatedPlan = await Plan.findByIdAndUpdate(
       planId,
-      { $addToSet: { invitedEmails: email } },
+      { $addToSet: { invitedEmails: email } }, // Make sure invitedEmails is an array
       { new: true }
     );
 
@@ -111,10 +112,11 @@ router.post("/invite", authenticateUser, async (req, res) => {
 
     res.status(200).json({ message: "Invite sent, saved, and email added to plan." });
   } catch (error) {
-    console.error("Email send error:", error);
+    console.error("Invite route error:", error.message, error.stack);
     res.status(500).json({ message: "Failed to send email or update invitedEmails" });
   }
 });
+
 
 
 
