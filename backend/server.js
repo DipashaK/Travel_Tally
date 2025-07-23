@@ -4,13 +4,38 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+const corsOptions = {
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "https://traveltally.netlify.app",
+      "http://localhost:3000"
+    ];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.error("Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
 
 // Middleware
-app.use(cors({
-  origin: "https://traveltally.netlify.app", 
-  credentials: true, 
-}));
-app.use(express.json());
+const allowedOrigins = [
+  "https://traveltally.netlify.app",
+  "http://localhost:3000"
+];
+
+
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // This will handle preflight requests
 
 // MongoDB Connection
 mongoose

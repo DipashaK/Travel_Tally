@@ -6,6 +6,61 @@ const authenticateUser = require("../middleware/authMiddleware");
 const Plan = require("../models/Plan")
 
 // Invite people (only logged-in users can send invites)
+// router.post("/invite", authenticateUser, async (req, res) => {
+//   const { email, planId, planName, inviteLink } = req.body;
+
+//   if (!email || !planId || !planName || !inviteLink) {
+//     return res.status(400).json({ message: "Missing required fields" });
+//   }
+
+//   const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//     auth: {
+//       user: process.env.EMAIL_USER,
+//       pass: process.env.EMAIL_PASS,
+//     },
+//   });
+
+//   const mailOptions = {
+//     from: `"Travel Tally" <${process.env.EMAIL_USER}>`,
+//     to: email,
+//     subject: `You're invited to join the ${planName} Travel Plan`,
+//     html: `<h2>You are invited to ${planName}</h2><a href="${inviteLink}">Click here to join</a>`,
+//   };
+
+//   try {
+//     // Send the email
+//     await transporter.sendMail(mailOptions);
+
+//     // Save invite to DB with sender's user ID
+//     await Invite.create({
+//       email,
+//       planId,
+//       planName,
+//       inviteLink,
+//       invitedBy: req.user.id,
+//     });
+
+//     // Update invitedEmail in Plan document
+//     const updatedPlan = await Plan.findByIdAndUpdate(
+//       planId,
+//       { invitedEmail: email },
+//       { new: true }
+//     );
+
+//     if (!updatedPlan) {
+//       return res.status(404).json({ message: "Plan not found to update invitedEmail" });
+//     }
+
+//     res.status(200).json({ message: "Invite email sent, saved, and invitedEmail updated." });
+//   } catch (error) {
+//     console.error("Email send error:", error);
+//     res.status(500).json({ message: "Failed to send email or update invitedEmail" });
+//   }
+// });
+
+
+
 router.post("/invite", authenticateUser, async (req, res) => {
   const { email, planId, planName, inviteLink } = req.body;
 
@@ -13,26 +68,29 @@ router.post("/invite", authenticateUser, async (req, res) => {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  const mailOptions = {
-    from: `"Travel Tally" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: `You're invited to join the ${planName} Travel Plan`,
-    html: `<h2>You are invited to ${planName}</h2><a href="${inviteLink}">Click here to join</a>`,
-  };
-
   try {
-    // Send the email
+    const existingInvite = await Invite.findOne({ email, planId });
+    if (existingInvite) {
+      return res.status(400).json({ message: "User already invited to this plan." });
+    }
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: `"Travel Tally" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: `You're invited to join the ${planName} Travel Plan`,
+      html: `<h2>You are invited to ${planName}</h2><a href="${inviteLink}">Click here to join</a>`,
+    };
+
     await transporter.sendMail(mailOptions);
 
-    // Save invite to DB with sender's user ID
     await Invite.create({
       email,
       planId,
@@ -41,23 +99,25 @@ router.post("/invite", authenticateUser, async (req, res) => {
       invitedBy: req.user.id,
     });
 
-    // Update invitedEmail in Plan document
     const updatedPlan = await Plan.findByIdAndUpdate(
       planId,
-      { invitedEmail: email },
+      { $addToSet: { invitedEmails: email } },
       { new: true }
     );
 
     if (!updatedPlan) {
-      return res.status(404).json({ message: "Plan not found to update invitedEmail" });
+      return res.status(404).json({ message: "Plan not found to update invitedEmails" });
     }
 
-    res.status(200).json({ message: "Invite email sent, saved, and invitedEmail updated." });
+    res.status(200).json({ message: "Invite sent, saved, and email added to plan." });
   } catch (error) {
     console.error("Email send error:", error);
-    res.status(500).json({ message: "Failed to send email or update invitedEmail" });
+    res.status(500).json({ message: "Failed to send email or update invitedEmails" });
   }
 });
+
+
+
 
 
 // Fetch invites (only for invites sent by this user for a plan)
