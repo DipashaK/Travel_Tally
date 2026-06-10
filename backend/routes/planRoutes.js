@@ -146,9 +146,8 @@ Use consistent formatting (like **bold**, emojis, and lists) to improve readabil
         error: "AI service is not configured. GOOGLE_API_KEY is missing.",
       });
     }
-
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
+    
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
     const response = await axios.post(
       apiUrl,
       {

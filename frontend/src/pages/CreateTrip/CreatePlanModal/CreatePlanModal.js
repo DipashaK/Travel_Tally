@@ -52,15 +52,18 @@ const CreatePlanModal = ({ isOpen, onClose }) => {
 
     const data = await response.json();
 
+    if (!response.ok) {
+      setAiPlan(data.error || "Error fetching AI plan. Please try again.");
+      return;
+    }
+
     if (data.aiPlan && data.planId) {
       setAiPlan(data.aiPlan);
 
-      // ✅ Store in sessionStorage if needed later
       sessionStorage.setItem("planId", data.planId);
       sessionStorage.setItem("aiPlan", data.aiPlan);
       sessionStorage.setItem("destination", destination);
 
-      // ✅ Navigate with planId and plan info
       navigate(`/ai-plan/${data.planId}`, {
         state: {
           aiPlan: data.aiPlan,
