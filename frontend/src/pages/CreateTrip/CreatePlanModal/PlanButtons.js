@@ -1,41 +1,53 @@
-// const PlanButtons = ({ generateAIPlan, loading }) => (
-//     <div className="flex gap-4 mt-4">
-//       <button className="bg-blue-200 text-black p-3 rounded w-1/2 hover:bg-blue-400">
-//         Create Your Plan
-//       </button>
-//       <button
-//         className="bg-purple-300 text-black p-3 rounded w-1/2 hover:bg-purple-400"
-//         onClick={generateAIPlan}
-//         disabled={loading}
-//       >
-//         {loading ? "Generating..." : "Generate AI Plan"}
-//       </button>
-//     </div>
-//   );
-  
-//   export default PlanButtons;
+import {
+  Sparkles,
+  Loader2,
+  Check,
+} from "lucide-react";
+import { T } from "./constants";
 
-
-
-import { useNavigate } from "react-router-dom";
-
-const PlanButtons = ({ generateAIPlan, loading }) => {
-  const navigate = useNavigate();
-
+const PlanButtons = ({
+  onSave,
+  onGenerate,
+  loading,
+  saved,
+}) => {
   return (
-    <div className="flex gap-4 mt-4">
+    <div className="flex gap-3 mt-5">
       <button
-        className="bg-blue-200 text-black p-3 rounded w-1/2 hover:bg-blue-400"
-        onClick={() => navigate("/create-plan")}
+        onClick={onSave}
+        className="gt-chip flex-1 rounded-md py-2.5 font-semibold text-sm flex items-center justify-center gap-2"
+        style={{
+          background: saved ? T.sage : "#fff",
+          color: saved ? "#fff" : T.ink,
+          border: `1.5px solid ${
+            saved ? T.sage : T.line
+          }`,
+        }}
       >
-        Create Your Plan
+        {saved && <Check size={15} />}
+        {saved ? "Saved" : "Save Trip"}
       </button>
+
       <button
-        className="bg-purple-300 text-black p-3 rounded w-1/2 hover:bg-purple-400"
-        onClick={generateAIPlan}
+        onClick={onGenerate}
         disabled={loading}
+        className="gt-chip flex-1 rounded-md py-2.5 font-semibold text-sm text-white flex items-center justify-center gap-2 disabled:opacity-70"
+        style={{
+          background: T.coral,
+        }}
       >
-        {loading ? "Generating..." : "Generate AI Plan"}
+        {loading ? (
+          <Loader2
+            size={15}
+            className="gt-spin"
+          />
+        ) : (
+          <Sparkles size={15} />
+        )}
+
+        {loading
+          ? "Generating..."
+          : "Generate AI Plan"}
       </button>
     </div>
   );

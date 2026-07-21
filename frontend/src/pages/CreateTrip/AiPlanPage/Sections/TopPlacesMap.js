@@ -145,8 +145,13 @@ const TopPlacesMap = ({
     setCustomDistance(null);
   };
 
+  // ... imports and logic unchanged, only the return JSX changes:
+
   return (
-    <div style={{ position: "relative", height: "400px", maxWidth: "1000px"}}>
+    <div
+      style={{ position: "relative", height: "400px", maxWidth: "1000px" }}
+      className="rounded-xl overflow-hidden border border-[#C99A44]/20 shadow-sm"
+    >
       <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
         <ChangeView center={center} zoom={13} />
         <TileLayer
@@ -154,39 +159,28 @@ const TopPlacesMap = ({
           attribution='&copy; OpenStreetMap contributors'
         />
 
-        {/* Routes between top places */}
-        {places.length > 1 && <Polyline positions={routeCoordinates} color="blue" />}
+        {places.length > 1 && <Polyline positions={routeCoordinates} color="#E8674F" weight={3} />}
 
-        {/* Place Markers */}
         {places.map((place) => {
           const coords = [place.lat, place.lon];
-          const info = travelInfo[place.name]; // From user to this place
-
+          const info = travelInfo[place.name];
           return (
-            <Marker
-              key={place.name}
-              position={coords}
-              eventHandlers={{ click: () => handleMarkerClick(place) }}
-            >
+            <Marker key={place.name} position={coords} eventHandlers={{ click: () => handleMarkerClick(place) }}>
               <Popup>
-                <div style={{ minWidth: "160px" }}>
-                  <h3>{place.name}</h3>
+                <div style={{ minWidth: "160px", fontFamily: "inherit" }}>
+                  <h3 style={{ color: "#0F3D3E", marginBottom: 4 }}>{place.name}</h3>
                   {place.imageUrl && (
-                    <img
-                      src={place.imageUrl}
-                      alt={place.name}
-                      style={{ width: "100%", marginTop: 8, borderRadius: 6 }}
-                    />
+                    <img src={place.imageUrl} alt={place.name} style={{ width: "100%", marginTop: 8, borderRadius: 6 }} />
                   )}
                   {place.description && (
-                    <p style={{ fontSize: "0.85rem", marginTop: 6 }}>{place.description}</p>
+                    <p style={{ fontSize: "0.85rem", marginTop: 6, color: "#1B1B18" }}>{place.description}</p>
                   )}
                   {info && (
-                    <>
+                    <div style={{ marginTop: 8, fontSize: "0.85rem" }}>
                       <p>🚗 <strong>By Car:</strong> {info.carTime}</p>
                       <p>✈️ <strong>By Flight:</strong> {info.flightTime}</p>
                       <p>📍 <strong>Distance:</strong> {info.distance} km</p>
-                    </>
+                    </div>
                   )}
                 </div>
               </Popup>
@@ -194,28 +188,22 @@ const TopPlacesMap = ({
           );
         })}
 
-        {/* User Marker */}
         {userLocation && (
           <>
-            <Marker position={userLocation}>
-              <Popup>You are here</Popup>
-            </Marker>
-            <Circle center={userLocation} radius={30} />
+            <Marker position={userLocation}><Popup>You are here</Popup></Marker>
+            <Circle center={userLocation} radius={30} pathOptions={{ color: "#0F3D3E" }} />
           </>
         )}
       </MapContainer>
 
-      {/* Distance Between 2 Clicked Places */}
       {customDistance && selectedMarkers.length === 2 && (
-        <div className="absolute top-2 left-2 bg-white rounded-lg shadow px-4 py-2 text-sm z-[1000]">
-          📏 Distance between <strong>{selectedMarkers[0].name}</strong> and{" "}
-          <strong>{selectedMarkers[1].name}</strong>: {customDistance} km
+        <div className="absolute top-3 left-3 bg-white/95 backdrop-blur rounded-lg shadow px-4 py-2 text-sm z-[1000] border border-[#C99A44]/20">
+          📏 <strong>{selectedMarkers[0].name}</strong> ↔ <strong>{selectedMarkers[1].name}</strong>: {customDistance} km
         </div>
       )}
 
-      {/* Reset */}
       <button
-        className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded z-[1000]"
+        className="absolute top-3 right-3 bg-[#0F3D3E] hover:bg-[#0a2d2e] text-[#FBF3E7] px-3 py-1.5 rounded-full text-xs font-medium tracking-wide z-[1000] transition-colors"
         onClick={resetSelection}
       >
         Reset Route

@@ -1,35 +1,51 @@
-const ActivitySelector = ({ selectedActivities, toggleActivity }) => {
-    const activities = [
-      "Sightseeing",
-      "Adventure",
-      "Cultural",
-      "Historical",
-      "Relaxation",
-      "Shopping",
-      "Nightlife",
-    ];
-  
-    return (
-      <div>
-        <label className="block font-semibold">Select activities :</label>
-        <div className="grid grid-cols-3 gap-3 mt-2 mb-4">
-          {activities.map((activity, index) => (
+import { Sparkles } from "lucide-react";
+import { ACTIVITIES, STAMP_ROT, T } from "./constants";
+
+const ActivitySelector = ({
+  selectedActivities,
+  toggleActivity,
+}) => {
+  return (
+    <div>
+      <label
+        className="flex items-center gap-2 text-xs tracking-widest uppercase font-semibold mb-2"
+        style={{ color: T.inkSoft }}
+      >
+        <Sparkles size={14} />
+        Activities
+      </label>
+
+      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+        {ACTIVITIES.map((activity, index) => {
+          const active = selectedActivities.includes(activity);
+
+          return (
             <button
-              key={index}
+              key={activity}
               onClick={() => toggleActivity(activity)}
-              className={`border p-2 rounded transition ${
-                selectedActivities.includes(activity)
-                  ? "bg-red-200 text-black"
-                  : "text-gray-600 hover:bg-gray-200"
+              className={`gt-chip rounded-full px-2 py-2 text-[11px] font-semibold relative ${
+                active ? "gt-stamp" : ""
               }`}
+              style={{
+                border: `2px ${
+                  active ? "solid" : "dashed"
+                } ${active ? T.coral : T.line}`,
+                color: active ? T.coral : T.inkSoft,
+                background: active
+                  ? "rgba(228,98,63,0.08)"
+                  : "transparent",
+                transform: active
+                  ? `rotate(${STAMP_ROT[index % STAMP_ROT.length]}deg)`
+                  : "none",
+              }}
             >
               {activity}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    );
-  };
-  
-  export default ActivitySelector;
-  
+    </div>
+  );
+};
+
+export default ActivitySelector;

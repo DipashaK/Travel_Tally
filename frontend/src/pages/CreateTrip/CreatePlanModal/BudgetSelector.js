@@ -1,26 +1,59 @@
-const BudgetSelector = ({ budget, setBudget }) => {
-    const budgets = ["Cheap", "Moderate", "Luxury"];
-  
-    return (
-      <div>
-        <label className="block font-semibold">Select Budget</label>
-        <div className="flex gap-3 mt-2 mb-4">
-          {budgets.map((option, index) => (
+import { Wallet } from "lucide-react";
+import { BUDGETS, T } from "./constants";
+
+const BudgetSelector = ({
+  budget,
+  setBudget,
+}) => {
+  return (
+    <div>
+      <label
+        className="flex items-center gap-2 text-xs tracking-widest uppercase font-semibold mb-2"
+        style={{ color: T.inkSoft }}
+      >
+        <Wallet size={14} />
+        Fare Class
+      </label>
+
+      <div className="grid grid-cols-3 gap-2">
+        {BUDGETS.map((item) => {
+          const active =
+            budget === item.label;
+
+          return (
             <button
-              key={index}
-              onClick={() => setBudget(option)}
-              className={`border p-3 rounded w-full transition ${
-                budget === option
-                  ? "bg-pink-200 text-black"
-                  : "text-gray-600 hover:bg-gray-200"
-              }`}
+              key={item.label}
+              onClick={() =>
+                setBudget(item.label)
+              }
+              className="gt-chip rounded-md px-2 py-2 text-left"
+              style={{
+                background: active
+                  ? T.gold
+                  : "#fff",
+                color: active
+                  ? "#fff"
+                  : T.ink,
+                border: `1.5px solid ${
+                  active
+                    ? T.gold
+                    : T.line
+                }`,
+              }}
             >
-              {option}
+              <div className="gt-mono text-[10px] font-bold">
+                {item.code}
+              </div>
+
+              <div className="text-[11px]">
+                {item.label}
+              </div>
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
-    );
-  };
-  
-  export default BudgetSelector;
+    </div>
+  );
+};
+
+export default BudgetSelector;

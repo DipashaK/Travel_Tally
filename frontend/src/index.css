@@ -82,3 +82,89 @@ code {
 .animate-fade-in-up {
   animation: fadeInUp 0.3s ease-out;
 }
+
+
+/* animations.css
+   Shared design tokens (fonts + keyframes) for the Travel Tally UI refresh.
+   Import this once, e.g. at the top of Dashboard.js: `import "../animations.css";`
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --tt-paper: #fbf3e5;
+  --tt-ink: #1b2a41;
+  --tt-teal: #0b4f6c;
+  --tt-coral: #e76f51;
+  --tt-gold: #f2b84b;
+  --tt-sage: #8aa399;
+}
+
+.font-display { font-family: 'Fraunces', serif; }
+.font-mono-tt { font-family: 'Space Mono', monospace; }
+
+/* Entrance animations */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes stampIn {
+  0%   { opacity: 0; transform: scale(1.7) rotate(-30deg); }
+  55%  { opacity: 1; transform: scale(0.9) rotate(-6deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-12deg); }
+}
+@keyframes flyAcross {
+  0%   { transform: translateX(-8%) translateY(0) rotate(-4deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateX(108%) translateY(-14px) rotate(-4deg); opacity: 0; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes dashMove {
+  to { background-position: 24px 0; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.94) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 rgba(231, 111, 81, 0.45); }
+  100% { box-shadow: 0 0 0 10px rgba(231, 111, 81, 0); }
+}
+
+.animate-fade-in-up   { animation: fadeInUp 0.6s ease-out both; }
+.animate-fade-in      { animation: fadeIn 0.5s ease-out both; }
+.animate-stamp        { animation: stampIn 0.8s cubic-bezier(.34,1.56,.64,1) both; }
+.animate-fly          { animation: flyAcross 6s ease-in-out infinite; }
+.animate-float        { animation: float 3.2s ease-in-out infinite; }
+.animate-modal-in     { animation: modalIn 0.28s cubic-bezier(.2,.8,.3,1) both; }
+.animate-dropdown-in  { animation: dropdownIn 0.2s ease-out both; }
+
+.ticket-dashes {
+  background-image: repeating-linear-gradient(to bottom, var(--tt-ink) 0 6px, transparent 6px 14px);
+  width: 2px;
+}
+
+.stamp-hover:hover .stamp-badge {
+  animation: pulseRing 1.4s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

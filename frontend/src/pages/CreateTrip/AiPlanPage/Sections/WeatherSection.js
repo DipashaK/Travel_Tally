@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  WiHumidity,
-  WiThermometer,
-  WiStrongWind,
-  WiSnow,
-  WiBarometer,
-  WiDaySunnyOvercast,
-} from "react-icons/wi";
+import { WiHumidity, WiThermometer, WiBarometer, WiDaySunnyOvercast } from "react-icons/wi";
 import { FaEye, FaWind } from "react-icons/fa";
 
 const WeatherSection = ({ destination }) => {
@@ -17,6 +10,7 @@ const WeatherSection = ({ destination }) => {
   useEffect(() => {
     if (!destination || destination === "Default Destination") {
       setError("Please enter a valid destination.");
+      setLoading(false);
       return;
     }
 
@@ -28,11 +22,7 @@ const WeatherSection = ({ destination }) => {
           `https://travel-tally-3mf9.onrender.com/api/weather/get-weather?destination=${destination}`
         );
         const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch weather data");
-        }
-
+        if (!response.ok) throw new Error(data.message || "Failed to fetch weather data");
         setWeatherData(data);
       } catch (err) {
         console.error("Error fetching weather data:", err);
@@ -46,100 +36,79 @@ const WeatherSection = ({ destination }) => {
   }, [destination]);
 
   if (loading) {
-    return <div className="text-center p-4">Loading weather data...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 p-8 text-[#1B1B18]/50 text-sm">
+        <span className="h-2 w-2 rounded-full bg-[#C99A44] animate-pulse" />
+        Checking the skies over {destination}…
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center p-4 text-red-500">Error: {error}</div>;
+    return (
+      <div className="text-center p-6 text-sm text-[#E8674F] bg-[#E8674F]/5 rounded-lg border border-[#E8674F]/20">
+        {error}
+      </div>
+    );
   }
 
   if (!weatherData) {
-    return <div className="text-center p-4">No weather data available.</div>;
+    return <div className="text-center p-4 text-[#1B1B18]/50 text-sm">No weather data available.</div>;
   }
 
   const {
-    location,
-    temperature,
-    condition,
-    windSpeed,
-    windDirection,
-    humidity,
-    maxTemp,
-    minTemp,
-    feelsLike,
-    seaLevel,
-    visibility,
+    location, temperature, condition, windSpeed, windDirection,
+    humidity, maxTemp, minTemp, feelsLike, seaLevel, visibility,
   } = weatherData;
 
+  const visibilityPct = Math.max(0, Math.min(100, (visibility / 10) * 100));
+
+  const StatRow = ({ icon, label, value }) => (
+    <div className="flex justify-between items-center text-sm py-1.5 border-b border-[#1B1B18]/5 last:border-0">
+      <span className="flex items-center gap-2 text-[#1B1B18]/60">{icon} {label}</span>
+      <span className="font-medium text-[#1B1B18]">{value}</span>
+    </div>
+  );
+
   return (
-    <div className="bg-white p-6">
-      <div className="grid grid-cols-2 lg:grid-cols-2 gap-4">
-        <div className="rounded-xl shadow p-4 flex flex-col items-center justify-center">
-          <h3 className="text-lg font-medium">{location}</h3>
-          <WiSnow size={40} />
-          <p className="text-3xl font-bold">{Math.round(temperature)}°</p>
-          <p className="text-gray-500 capitalize">{condition}</p>
-        </div>
+    <div className="grid sm:grid-cols-2 gap-4">
+      {/* Hero temp card */}
+      <div className="rounded-xl border border-[#C99A44]/20 bg-[#0F3D3E] text-[#FBF3E7] p-6 flex flex-col items-center justify-center text-center">
+        <p className="uppercase tracking-[0.2em] text-[10px] text-[#C99A44] mb-1">{location}</p>
+        <p className="text-5xl font-serif">{Math.round(temperature)}°</p>
+        <p className="capitalize text-[#FBF3E7]/60 text-sm mt-1">{condition}</p>
+      </div>
 
-        <div className="rounded-xl shadow p-4 flex items-center gap-4">
-          <FaWind size={48} className="text-green-500" />
-          <div>
-            <p className="text-sm">
-              💨 Wind Speed: <strong>{windSpeed} m/s</strong>
-            </p>
-            <p className="text-sm">
-              🧭 Wind Direction: <strong>{windDirection}°</strong>
-            </p>
-          </div>
+      {/* Wind */}
+      <div className="rounded-xl border border-[#1B1B18]/10 bg-white p-5 flex items-center gap-4">
+        <FaWind size={32} className="text-[#C99A44] shrink-0" />
+        <div className="text-sm space-y-1">
+          <p>Wind speed: <strong>{windSpeed} m/s</strong></p>
+          <p>Direction: <strong>{windDirection}°</strong></p>
         </div>
+      </div>
 
-        <div className="rounded-xl shadow p-4">
-          <div className="flex justify-between text-sm mb-1">
-            <span className="flex items-center gap-1">
-              <WiHumidity /> Humidity
-            </span>
-            <span>{humidity}%</span>
-          </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span className="flex items-center gap-1">
-              <WiDaySunnyOvercast /> Max Temperature
-            </span>
-            <span>{maxTemp}°</span>
-          </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span className="flex items-center gap-1">
-              <WiThermometer /> Min Temperature
-            </span>
-            <span>{minTemp}°</span>
-          </div>
-          <div className="flex justify-between text-sm mb-1">
-            <span className="flex items-center gap-1">🌡️ Feels like</span>
-            <span>{feelsLike}°</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="flex items-center gap-1">
-              <WiBarometer /> Sea Level
-            </span>
-            <span>{seaLevel} hPa</span>
-          </div>
-        </div>
+      {/* Details */}
+      <div className="rounded-xl border border-[#1B1B18]/10 bg-white p-5">
+        <StatRow icon={<WiHumidity />} label="Humidity" value={`${humidity}%`} />
+        <StatRow icon={<WiDaySunnyOvercast />} label="Max Temperature" value={`${maxTemp}°`} />
+        <StatRow icon={<WiThermometer />} label="Min Temperature" value={`${minTemp}°`} />
+        <StatRow icon="🌡️" label="Feels like" value={`${feelsLike}°`} />
+        <StatRow icon={<WiBarometer />} label="Sea Level" value={`${seaLevel} hPa`} />
+      </div>
 
-        {/* Card 4: Visibility */}
-        <div className="rounded-xl shadow p-4">
-          <h4 className="text-md font-semibold mb-2">Visibility</h4>
-          <div className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-1">
-              <FaEye className="text-black" />
-            </span>
-            <span className="w-full h-1 bg-black mx-2 rounded-full relative">
-              <span
-                className="absolute top-[-6px] right-0 bg-black h-4 w-4 rounded-full"
-                style={{ right: "0" }}
-              ></span>
-            </span>
-            <span>{visibility}km</span>
-          </div>
+      {/* Visibility */}
+      <div className="rounded-xl border border-[#1B1B18]/10 bg-white p-5">
+        <h4 className="text-sm font-semibold text-[#1B1B18] mb-3 flex items-center gap-2">
+          <FaEye className="text-[#C99A44]" /> Visibility
+        </h4>
+        <div className="h-1.5 bg-[#1B1B18]/10 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-[#E8674F] rounded-full transition-all"
+            style={{ width: `${visibilityPct}%` }}
+          />
         </div>
+        <p className="text-xs text-[#1B1B18]/50 mt-2">{visibility} km</p>
       </div>
     </div>
   );
