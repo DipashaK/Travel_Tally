@@ -7,8 +7,8 @@ import { searchPlaces } from "./api";
 const DestinationInput = ({
   destination,
   setDestination,
-  locked,
-  setLocked,
+  locked = false,
+  setLocked = () => {}, // Default empty function
 }) => {
   const [suggestions, setSuggestions] = useState([]);
   const timer = useRef(null);
@@ -17,7 +17,9 @@ const DestinationInput = ({
     const value = e.target.value;
 
     setDestination(value);
-    setLocked(false);
+
+    // Safe even if parent doesn't pass setLocked
+    setLocked?.(false);
 
     clearTimeout(timer.current);
 
@@ -39,7 +41,9 @@ const DestinationInput = ({
   const handleSelect = (place) => {
     setDestination(place.display_name.split(",")[0]);
     setSuggestions([]);
-    setLocked(true);
+
+    // Safe even if parent doesn't pass setLocked
+    setLocked?.(true);
   };
 
   return (

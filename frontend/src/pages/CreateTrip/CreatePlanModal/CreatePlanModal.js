@@ -138,8 +138,10 @@ const CreatePlanModal = ({ isOpen, onClose }) => {
                 <BudgetSelector budget={budget} setBudget={setBudget} />
               </div>
 
-              <PlanButtons generateAIPlan={generateAIPlan} loading={loading} />
-
+<PlanButtons
+  onGenerate={generateAIPlan}
+  loading={loading}
+/>
               <div className="mt-8">
                 <AIPlanDisplay aiPlan={aiPlan} />
               </div>

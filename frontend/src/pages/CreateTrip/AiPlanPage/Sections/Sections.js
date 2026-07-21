@@ -4,6 +4,8 @@ import CardSection from "../CardSection";
 import { convertToList, formatItinerary, parseCuisines } from "../utils";
 import WeatherSection from "./WeatherSection";
 import PackingChecklist from "./PackingCheclist";
+import BudgetSection from "./BudgetSection";
+import ItinerarySection from "./ItinerarySection";
 import axios from "axios";
 import TopPlacesMap from "./TopPlacesMap";
 import ReactMarkdown from "react-markdown";
@@ -159,10 +161,8 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
       </CardSection>
 
       <CardSection title="Itinerary" eyebrow="Day by day" innerRef={sectionRefs.itinerary}>
-        <div className="prose prose-sm max-w-none prose-headings:font-serif prose-headings:text-[#0F3D3E]">
-          {formatItinerary(parsedPlan.itinerary)}
-        </div>
-      </CardSection>
+  <ItinerarySection days={formatItinerary(parsedPlan.itinerary)} />
+</CardSection>
 
       <CardSection title="Local Cuisines" eyebrow="Taste of the trip" innerRef={sectionRefs.cuisines}>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -211,10 +211,8 @@ const Sections = ({ parsedPlan, sectionRefs, destination }) => {
       </CardSection>
 
       <CardSection title="Budget" eyebrow="Estimated cost" innerRef={sectionRefs.budget}>
-        <ul className="pl-6 space-y-1.5 marker:text-[#C99A44]">
-          {convertToList(parsedPlan.budget, "💸")}
-        </ul>
-      </CardSection>
+  <BudgetSection budget={parsedPlan.budget} />
+</CardSection>
     </motion.div>
   );
 };

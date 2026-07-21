@@ -1,11 +1,10 @@
 export const sanitizeText = (text) =>
   text
-    ?.replace(/^---$|^\s*---\s*$/gm, "")  
-    .replace(/\*/g, "")                   
-    .replace(/:/g, "")                   
-    .replace(/\n{2,}/g, "\n\n")           
+    ?.replace(/^---$|^\s*---\s*$/gm, "")
+    .replace(/\*/g, "")
+    .replace(/:/g, "")
+    .replace(/\n{2,}/g, "\n\n")
     .trim() || "";
-
 
 export const extractSection = (text, startPattern, endPattern = null) => {
   const startRegex = new RegExp(startPattern, "i");
@@ -29,41 +28,18 @@ export const extractSection = (text, startPattern, endPattern = null) => {
 export const parseAiPlan = (plan, destination) => {
   if (!plan) return {};
 
-  const aboutPlace = extractSection(
-    plan,
-    `\\s*${destination}.*?\\n`,
-    "\\*\\*Top Activities\\*\\*"
-  );
-
-  const topActivities = extractSection(
-    plan,
-    "Top Activities",
-    "Top Places to Visit"
-  );
+  const aboutPlace = extractSection(plan, `\\s*${destination}.*?\\n`, "\\*\\*Top Activities\\*\\*");
+  const topActivities = extractSection(plan, "Top Activities", "Top Places to Visit");
   const topPlaces = extractSection(plan, "Top Places to Visit", "Itinerary");
   const itinerary = extractSection(plan, "Itinerary", "Local Cuisines");
-  const localCuisines = extractSection(
-    plan,
-    "Local Cuisines",
-    "Packing Checklist"
-  );
-  const packingChecklist = extractSection(
-    plan,
-    "Packing Checklist",
-    "Best Time to Visit"
-  );
+  const localCuisines = extractSection(plan, "Local Cuisines", "Packing Checklist");
+  const packingChecklist = extractSection(plan, "Packing Checklist", "Best Time to Visit");
   const bestTimeToVisit = extractSection(plan, "Best Time to Visit", "Budget");
   const budget = extractSection(plan, "Budget");
 
   return {
-    aboutPlace,
-    topActivities,
-    topPlaces,
-    itinerary,
-    localCuisines,
-    packingChecklist,
-    bestTimeToVisit,
-    budget,
+    aboutPlace, topActivities, topPlaces, itinerary,
+    localCuisines, packingChecklist, bestTimeToVisit, budget,
   };
 };
 
@@ -80,30 +56,19 @@ export const convertToList = (content, emoji = "✅") => {
     ));
 };
 
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
 export const formatItinerary = (itinerary) => {
   if (!itinerary || typeof itinerary !== "string") return [];
 
-  const timeIcons = {
-    Morning: "🌅",
-    Afternoon: "🌞",
-    Evening: "🌇",
-    Night: "🌙",
-  };
-
+  const timeIcons = { Morning: "🌅", Afternoon: "🌞", Evening: "🌇", Night: "🌙" };
   const cleaned = itinerary.trim();
-
   const days = cleaned.split(/(?=Day\s+\d+)/gi);
 
   return days
     .map((dayBlock, dayIndex) => {
-      const lines = dayBlock
-        .trim()
-        .split(/\r?\n/)
-        .map((line) => line.trim())
-        .filter(Boolean);
-
-      const titleLine = lines.find((line) => /^Day\s+\d+/i.test(line)) || "";
-      const title = titleLine;
+      const lines = dayBlock.trim().split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+      const title = lines.find((line) => /^Day\s+\d+/i.test(line)) || "";
 
       const sections = [];
       let currentPeriod = "";
@@ -113,10 +78,7 @@ export const formatItinerary = (itinerary) => {
         const periodMatch = line.match(/^(Morning|Afternoon|Evening|Night)$/i);
         if (periodMatch) {
           if (currentPeriod && currentItems.length > 0) {
-            sections.push({
-              period: currentPeriod,
-              items: currentItems,
-            });
+            sections.push({ period: currentPeriod, items: currentItems });
           }
           currentPeriod = capitalize(periodMatch[1]);
           currentItems = [];
@@ -128,44 +90,50 @@ export const formatItinerary = (itinerary) => {
       });
 
       if (currentPeriod && currentItems.length > 0) {
-        sections.push({
-          period: currentPeriod,
-          items: currentItems,
-        });
+        sections.push({ period: currentPeriod, items: currentItems });
       }
 
       if (sections.length === 0) return null;
 
-      return (
-        <div
-          key={dayIndex}
-          className="p-4 border rounded-xl bg-white shadow-md mt-4"
-        >
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            <span className="inline-flex items-center gap-2">📅 {title}</span>
-          </h3>
-
-          {sections.map((section, i) => (
-            <div key={i} className="bg-blue-50 p-4 rounded-lg mb-4 shadow-sm">
-              <h4 className="text-md font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                <span>{timeIcons[section.period] || "🕒"}</span>{" "}
-                {section.period}
-              </h4>
-              <ul className="list-disc list-inside text-gray-700">
-                {section.items.map((item, j) => (
-                  <li key={j}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      );
+      return { dayIndex, title, sections };
     })
     .filter(Boolean);
 };
 
-const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+export const parseBudget = (budgetText) => {
+  if (!budgetText) return null;
 
+  const categories = [
+    "Flights",
+    "Stay",
+    "Food",
+    "Transport",
+    "Activities",
+  ];
+
+  const entries = [];
+
+  categories.forEach((category) => {
+    const regex = new RegExp(
+      `${category}[\\s\\S]*?Estimated Range\\s*:?\\s*([₹$€£]?)([\\d,]+)\\s*[-–]\\s*([₹$€£]?)([\\d,]+)`,
+      "i"
+    );
+
+    const match = budgetText.match(regex);
+
+    if (!match) return;
+
+    const min = parseInt(match[2].replace(/,/g, ""));
+    const max = parseInt(match[4].replace(/,/g, ""));
+
+    entries.push({
+      label: category,
+      amount: Math.round((min + max) / 2),
+    });
+  });
+
+  return entries.length ? entries : null;
+};
 
 export const parseCuisines = (rawText) => {
   if (!rawText) return [];
