@@ -124,14 +124,25 @@ Add any important festivals, seasonal events, or travel tips (short & useful).
 
 **Budget**
 
-Break down typical costs into these categories:  
-- Flights  
-- Stay  
-- Food  
-- Transport  
-- Activities  
+IMPORTANT:
+For this section, ignore all previous formatting instructions.
 
-For each, give an estimated range and include 1–2 quick money-saving tips.
+Output ONLY these 5 lines exactly in this format.
+
+Flights: ₹10000-25000
+Stay: ₹2000-5000
+Food: ₹500-1500
+Transport: ₹1000-3000
+Activities: ₹1000-5000
+
+Rules:
+- No bullet points
+- No emojis
+- No bold text
+- No explanations
+- No tips
+- No headings inside Budget
+- No additional text after these five lines
 
 ---
 
